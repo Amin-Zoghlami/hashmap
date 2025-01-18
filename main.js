@@ -38,6 +38,9 @@ console.log(test.get("moon"));
 console.log(test.has("sun"));
 console.log(test.get("sun"));
 
+test.set("sun", "gold");
+test.set("apple", "red");
+test.set("ice cream", "pink");
 test.remove("moon");
 console.log(test.length());
 console.log(test.keys());
@@ -45,3 +48,5 @@ console.log(test.values());
 console.log(test.entries());
 console.log(test.has("moon"));
 console.log(test.get("moon"));
+console.log(test.has("sun"));
+console.log(test.get("sun"));
