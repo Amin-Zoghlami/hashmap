@@ -3,42 +3,34 @@ import LinkedList from "./list.js";
 export default class HashMap {
   #map = [];
   #capacity = 0;
-  static loadFactor = 0.75;
+  #loadFactor = 0;
 
   constructor() {
-    this.#createMap();
-  }
-
-  #createMap() {
-    for (let i = 0; i < 16; i++) {
-      this.#map.push(new LinkedList());
-    }
-
+    this.#createMap(16);
     this.#capacity = 16;
+    this.#loadFactor = 0.75;
   }
 
-  #doubleCapacity() {
-    for (let i = 0; i < this.#capacity; i++) {
+  #createMap(size) {
+    for (let i = 0; i < size; i++) {
       this.#map.push(new LinkedList());
     }
-
-    this.#capacity *= 2;
   }
 
-  hash(key) {
+  #hash(key) {
     let hashCode = 0;
 
     const primeNumber = 31;
     for (let i = 0; i < key.length; i++) {
       hashCode = primeNumber * hashCode + key.charCodeAt(i);
-      hashCode %= this.#map.length;
+      hashCode %= this.#capacity;
     }
 
     return hashCode;
   }
 
   set(key, value) {
-    const bucket = this.#map[this.hash(key)];
+    const bucket = this.#map[this.#hash(key)];
 
     if (this.has(key)) {
       for (let i = 0; i < bucket.size(); i++) {
@@ -51,13 +43,19 @@ export default class HashMap {
 
     bucket.append([key, value]);
 
-    if (this.#capacity * this.loadFactor <= this.length()) {
-      this.#doubleCapacity();
+    if (this.#capacity * this.#loadFactor < this.length()) {
+      const entries = this.entries();
+
+      this.#map = [];
+      this.#capacity *= 2;
+
+      this.#createMap(this.#capacity);
+      for (const entry of entries) this.set(entry[0], entry[1]);
     }
   }
 
   get(key) {
-    const bucket = this.#map[this.hash(key)];
+    const bucket = this.#map[this.#hash(key)];
 
     for (let i = 0; i < bucket.size(); i++) {
       if (bucket.at(i).value[0] === key) {
@@ -69,7 +67,7 @@ export default class HashMap {
   }
 
   has(key) {
-    const bucket = this.#map[this.hash(key)];
+    const bucket = this.#map[this.#hash(key)];
 
     for (let i = 0; i < bucket.size(); i++) {
       if (bucket.at(i).value[0] === key) {
@@ -81,7 +79,7 @@ export default class HashMap {
   }
 
   remove(key) {
-    const bucket = this.#map[this.hash(key)];
+    const bucket = this.#map[this.#hash(key)];
 
     for (let i = 0; i < bucket.size(); i++) {
       if (bucket.at(i).value[0] === key) {
@@ -105,6 +103,7 @@ export default class HashMap {
 
   clear() {
     this.#map = [];
+    this.#createMap(16);
   }
 
   keys() {

@@ -160,6 +160,7 @@ export default class LinkedList {
 
     if (index === 0) {
       this.#head = this.#head.nextNode;
+      return;
     }
 
     let currNode = this.#head;
